@@ -70,12 +70,39 @@ with st.sidebar:
 if page == "🏠 Home":
     page_header("JusticeFlow", "AI-Powered Dispute Resolution Platform")
 
+    # Indian judicial crisis banner
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #2C1A0E, #3D2818); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
+        <div style="text-align:center; margin-bottom: 1rem;">
+            <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: #D4A843;">🇮🇳 Indian Judicial Crisis — Source: National Judicial Data Grid (NJDG), 2024</span>
+        </div>
+        <div style="display: flex; justify-content: space-around; text-align: center; flex-wrap: wrap; gap: 1rem;">
+            <div>
+                <div style="font-size: 2rem; font-weight: 800; color: #C0522B;">4.7 Cr+</div>
+                <div style="font-size: 0.8rem; color: #F5F0E8; opacity: 0.8;">Cases Pending</div>
+            </div>
+            <div>
+                <div style="font-size: 2rem; font-weight: 800; color: #D4A843;">3-5 Yrs</div>
+                <div style="font-size: 0.8rem; color: #F5F0E8; opacity: 0.8;">Avg Disposal Time</div>
+            </div>
+            <div>
+                <div style="font-size: 2rem; font-weight: 800; color: #6B8F71;">70%</div>
+                <div style="font-size: 0.8rem; color: #F5F0E8; opacity: 0.8;">Settleable Pre-Trial</div>
+            </div>
+            <div>
+                <div style="font-size: 2rem; font-weight: 800; color: #F5F0E8;">21</div>
+                <div style="font-size: 0.8rem; color: #F5F0E8; opacity: 0.8;">Judges per Million</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
     st.markdown("""
     <div style="max-width: 800px;">
         <p style="font-size: 1.1rem; color: #6B4C35; line-height: 1.6;">
-            Transform dispute resolution from a slow, paper-bound process into an intelligent, 
-            real-time system that saves courts time, guides parties toward fair settlements, 
-            and exposes bad actors through relational graph intelligence.
+            JusticeFlow uses AI to transform India's overburdened courts — screening trivial cases, 
+            finding precedents in seconds, and settling disputes before they reach trial. 
+            Built for judges, lawyers, and litigants who deserve faster justice.
         </p>
     </div>
     """, unsafe_allow_html=True)

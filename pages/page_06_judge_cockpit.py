@@ -12,9 +12,24 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
 STATUTE_PROMPT = PromptTemplate.from_template("""
-Given this legal case, suggest 2-4 relevant statute citations.
+You are an Indian legal research assistant. Given this case, cite 2-4 relevant INDIAN statutes, acts, or sections that a judge should review.
+Use ONLY real Indian legislation such as:
+- Indian Penal Code (IPC) sections
+- Code of Civil Procedure (CPC) sections
+- Code of Criminal Procedure (CrPC) sections
+- Consumer Protection Act, 2019
+- Transfer of Property Act, 1882
+- Indian Contract Act, 1872
+- Rent Control Acts (state-specific)
+- Real Estate (Regulation and Development) Act (RERA), 2016
+- Industrial Disputes Act, 1947
+- Payment of Wages Act, 1936
+- Specific Relief Act, 1963
+- Limitation Act, 1963
+- Negotiable Instruments Act, 1881
+
 Return JSON only, no markdown:
-{{"citations": [{{"statute": "<code>", "title": "<title>", "relevance": "<one line>"}}], "recommended_outcome": "<brief recommendation>", "confidence": <int 0-100>}}
+{{"citations": [{{"statute": "<Act name, Section number>", "title": "<short title of the provision>", "relevance": "<one line explaining why this applies to the case>"}}], "recommended_outcome": "<brief recommendation for the judge based on Indian legal precedent>", "confidence": <int 0-100>}}
 Category: {category} Summary: {summary} Jurisdiction: {jurisdiction}
 """)
 

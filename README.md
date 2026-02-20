@@ -21,6 +21,7 @@
 - [Project Structure](#-project-structure)
 - [Getting Started](#-getting-started)
 - [Demo Flow](#-demo-flow)
+- [Business Model & Sustainability](#-business-model--sustainability)
 - [Future Roadmap](#-future-roadmap)
 
 ---
@@ -352,14 +353,138 @@ Follow this sequence for the best demonstration experience:
 
 ---
 
+## � Business Model & Sustainability
+
+### The Opportunity
+
+India alone has **5+ crore (50 million) pending cases** as of 2024 (National Judicial Data Grid). The average disposal time for a civil case is **3–5 years**. The Indian legal tech market is projected to reach **$2.1 billion by 2027** (NASSCOM), yet most courts still operate on paper-based workflows.
+
+JusticeFlow targets this gap with a **B2G (Business-to-Government) + B2B SaaS** model.
+
+---
+
+### Revenue Streams
+
+#### Tier 1: 🏛️ Court System License (Primary — B2G)
+**Who pays:** State Judiciary / District Court Administration (via e-Courts Mission Phase III funding)
+
+| Component | Pricing | What's Included |
+|---|---|---|
+| **Per-judge seat** | ₹3,000/month (~$36/month) | Judge Cockpit, DLS Engine, Auto-Filter, Emotion Monitor |
+| **Court admin license** | ₹5,000/month per court | Conflict Graph, case routing, analytics dashboard |
+| **Setup & training** | ₹2,00,000 one-time per district | On-site deployment, judicial training, data migration |
+
+**Target:** Start with 5 District Courts in Karnataka → expand to all 774 districts nationally.
+
+**Revenue math:** 1 district = ~20 judges + 5 admin seats = ₹85,000/month = **₹10.2 lakh/year per district**. At 50 districts (Year 2): **₹5.1 crore/year**.
+
+---
+
+#### Tier 2: 👨‍💼 Lawyer & Law Firm SaaS (B2B)
+
+| Plan | Price | Features |
+|---|---|---|
+| **Solo Practitioner** | ₹999/month | DLS scoring, Case DNA matching, Negotiation prep (5 cases/month) |
+| **Law Firm (up to 10 users)** | ₹7,999/month | Unlimited cases, team dashboard, case strategy simulator, API access |
+| **Enterprise (50+ users)** | Custom pricing | White-label, custom models, priority support, SLA guarantees |
+
+**Target market:** India has **1.7 million registered advocates** (Bar Council of India). Capturing just **0.5%** at the Solo tier = 8,500 users = **₹10.2 crore/year**.
+
+---
+
+#### Tier 3: 📊 Data & Insights (B2G/B2B)
+
+| Product | Price | Buyer |
+|---|---|---|
+| **Court Analytics API** | ₹50,000/month | Legal research firms (Manupatra, SCC Online, Indian Kanoon) |
+| **Policy Intelligence Reports** | ₹2,00,000/report | Ministry of Law & Justice, NITI Aayog, Law Commissions |
+| **Anonymized Trend Data** | Revenue share | Legal insurance providers, litigation funding firms |
+
+---
+
+### Market Sizing (India)
+
+| Metric | Value |
+|---|---|
+| **TAM (Total Addressable Market)** | ₹1,500 crore — all Indian courts + all advocates |
+| **SAM (Serviceable)** | ₹200 crore — District/High Courts + urban advocates |
+| **SOM (Obtainable in 3 years)** | ₹15–25 crore — Karnataka pilot + early B2B adoption |
+
+---
+
+### Unit Economics
+
+| Metric | Value |
+|---|---|
+| **Cost to serve 1 judge/month** | ₹800 (Groq API: ₹500, infra: ₹200, support: ₹100) |
+| **Revenue per judge/month** | ₹3,000 |
+| **Gross margin** | **73%** |
+| **Customer Acquisition Cost** | ₹15,000 per court (government tender process) |
+| **Lifetime Value (3-year contract)** | ₹10.2 lakh per district |
+| **LTV:CAC Ratio** | **68:1** |
+
+---
+
+### 3-Year Financial Projection
+
+| Year | Courts | Lawyer Users | Annual Revenue | Status |
+|---|---|---|---|---|
+| **Year 1** | 5 districts (Karnataka pilot) | 500 solos | ₹1.1 crore | Seed-funded, break-even |
+| **Year 2** | 50 districts (4 states) | 5,000 solos + 100 firms | ₹8.5 crore | Series A, operationally profitable |
+| **Year 3** | 200 districts (national) | 20,000 users | ₹25 crore | Series B, expanding to Southeast Asia |
+
+---
+
+### Competitive Moats
+
+1. **Network effect** — Every case filed improves the Case DNA database, making future predictions more accurate. More data = better matching = more value.
+2. **Government lock-in** — Once integrated into a court's workflow, switching costs are extremely high (training, data migration, process redesign).
+3. **Data flywheel** — Historical case outcomes feed back into the DLS model, creating a continuously improving prediction engine that competitors cannot replicate without access to the same data.
+4. **Multi-agent IP** — The round-by-round negotiation engine with judicial intervention is a novel architecture not replicated by any existing legal tech tool.
+
+---
+
+### Go-to-Market Strategy
+
+**Phase 1 (Months 1–6): Karnataka Pilot**
+- Partner with Karnataka State Legal Services Authority (KSLSA)
+- Deploy in 5 District Courts as a free pilot under the e-Courts Mission Phase III scheme
+- Collect outcome data to validate AI accuracy metrics
+
+**Phase 2 (Months 6–12): Paid Rollout**
+- Convert pilot courts to paid licenses
+- Launch B2B SaaS for Bangalore-based law firms
+- Present case study at National Legal Tech Conference
+
+**Phase 3 (Year 2): National Expansion**
+- Bid for state-level e-Courts tenders (Maharashtra, Tamil Nadu, Delhi)
+- API partnerships with Indian Kanoon and SCC Online
+- Regional language support via Bhashini API integration
+
+---
+
+### The Ask (Investor Pitch)
+
+> **Seeking ₹50 lakh seed investment** for 10% equity to fund:
+> - 6-month Karnataka pilot deployment (₹15L)
+> - Engineering team (2 developers × 6 months) (₹18L)
+> - Government relations & legal compliance (₹7L)
+> - Cloud infrastructure & API costs (₹5L)
+> - Marketing & conference presence (₹5L)
+>
+> **Expected ROI:** Break-even at Month 10. 5x return by Year 2 at Series A valuation of ₹25 crore.
+
+---
+
 ## 🔮 Future Roadmap
 
-- **RAG Integration** — Connect to real legal databases (CourtListener, Google Scholar) for actual precedent retrieval
-- **Voice Input** — Dictate case descriptions using Whisper speech-to-text
-- **Multi-language Support** — Serve non-English-speaking litigants
+- **RAG Integration** — Connect to real legal databases (Indian Kanoon, SCC Online, Manupatra) for actual precedent retrieval
+- **Bhashini API** — Hindi, Kannada, Tamil, Telugu language support for non-English courts
+- **Voice Input** — Dictate case descriptions using Whisper speech-to-text for rural courts
 - **Appeal Predictor** — Estimate likelihood of appeal based on case DNA and judge history
-- **Real-time Court Calendar** — Integrate with court scheduling systems for automatic hearing slot suggestions
-- **Fine-tuned Legal LLM** — Domain-specific model trained on actual court decisions for higher accuracy
+- **Real-time Court Calendar** — Integrate with NJDG for automatic hearing slot suggestions
+- **Fine-tuned Legal LLM** — Domain-specific model trained on Indian court decisions (IPC, CPC, CrPC)
+- **Mobile App** — Flutter-based app for advocates to file cases and check status on the go
 
 ---
 
