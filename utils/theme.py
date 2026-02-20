@@ -289,6 +289,12 @@ def inject_css():
     [style*="background:#3D2818"] div {
         color: #F5F0E8 !important;
     }
+
+    /* ─── Code blocks (st.code) ─── */
+    .stCode, .stCode pre, .stCode code, .stCode span,
+    [data-testid="stCode"] pre, [data-testid="stCode"] code, [data-testid="stCode"] span {
+        color: #F5F0E8 !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
