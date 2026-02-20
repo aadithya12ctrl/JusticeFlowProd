@@ -37,6 +37,7 @@ with st.sidebar:
     page = st.radio(
         "Navigate",
         [
+            "🎤 Live Demo",
             "🏠 Home",
             "📝 File Case",
             "📊 DLS Engine",
@@ -225,4 +226,7 @@ elif page == "👨‍⚖️ Judge Cockpit":
     render()
 elif page == "🕸️ Conflict Graph":
     from pages.page_07_conflict_graph import render
+    render()
+elif page == "🎤 Live Demo":
+    from pages.page_08_live_demo import render
     render()
