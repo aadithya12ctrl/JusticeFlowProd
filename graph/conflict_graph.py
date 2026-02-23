@@ -38,6 +38,34 @@ def build_graph(db_path: str = None) -> nx.MultiDiGraph:
     return G
 
 
+def get_consolidated_edges(G) -> list[dict]:
+    """
+    Merge parallel multi-edges between the same node pair into single
+    weighted entries for cleaner rendering.
+    Returns list of dicts: {source, target, weight, case_ids, edge_types}.
+    """
+    edge_map: dict[tuple, dict] = {}
+    for u, v, data in G.edges(data=True):
+        key = (min(u, v), max(u, v))          # undirected grouping
+        if key not in edge_map:
+            edge_map[key] = {
+                "source": u,
+                "target": v,
+                "weight": 0,
+                "case_ids": [],
+                "edge_types": set(),
+            }
+        edge_map[key]["weight"] += 1
+        cid = data.get("case_id", "")
+        if cid and cid not in edge_map[key]["case_ids"]:
+            edge_map[key]["case_ids"].append(cid)
+        etype = data.get("edge_type", "")
+        if etype:
+            edge_map[key]["edge_types"].add(etype)
+
+    return list(edge_map.values())
+
+
 def detect_repeat_offenders(G: nx.MultiDiGraph, threshold: int = 3) -> list[dict]:
     """
     Find entities involved in more cases than the threshold.

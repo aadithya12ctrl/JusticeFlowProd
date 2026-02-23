@@ -7,7 +7,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from utils.theme import page_header
 from utils.charts import render_conflict_graph
 from config import DB_PATH
-from graph.conflict_graph import build_graph, detect_repeat_offenders, get_entity_history, detect_systematic_patterns
+from graph.conflict_graph import build_graph, detect_repeat_offenders, get_entity_history, detect_systematic_patterns, get_consolidated_edges
 
 
 def render():
@@ -19,13 +19,17 @@ def render():
         st.info("📭 No entities in the graph yet. File cases or seed demo data to populate the graph.")
         return
 
+    consolidated = get_consolidated_edges(G)
+
     # Stats row
-    c1, c2, c3 = st.columns(3)
+    c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.markdown(f'<div class="metric-card" style="text-align:center;"><h3>Nodes</h3><div class="value">{G.number_of_nodes()}</div></div>', unsafe_allow_html=True)
     with c2:
-        st.markdown(f'<div class="metric-card" style="text-align:center;"><h3>Edges</h3><div class="value">{G.number_of_edges()}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-card" style="text-align:center;"><h3>Unique Connections</h3><div class="value">{len(consolidated)}</div></div>', unsafe_allow_html=True)
     with c3:
+        st.markdown(f'<div class="metric-card" style="text-align:center;"><h3>Total Edges</h3><div class="value">{G.number_of_edges()}</div></div>', unsafe_allow_html=True)
+    with c4:
         offenders = detect_repeat_offenders(G, threshold=3)
         st.markdown(f'<div class="metric-card" style="text-align:center;border-left-color:#B03A2E;"><h3>Repeat Offenders</h3><div class="value" style="color:#B03A2E;">{len(offenders)}</div></div>', unsafe_allow_html=True)
 

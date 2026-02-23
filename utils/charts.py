@@ -118,66 +118,188 @@ def render_dna_helix(vector: list[float], twin_vector: list[float] = None) -> go
 
 
 def render_conflict_graph(G) -> go.Figure:
-    """Render a NetworkX graph as an interactive Plotly scatter plot."""
+    """Render a NetworkX graph as a polished, consolidated Plotly scatter plot."""
     import networkx as nx
+    from graph.conflict_graph import get_consolidated_edges
 
+    # ── empty-graph guard ────────────────────────────────────────
     if G.number_of_nodes() == 0:
         fig = go.Figure()
         fig.update_layout(
-            paper_bgcolor="#F5F0E8",
+            paper_bgcolor="#1a1a2e",
+            plot_bgcolor="#1a1a2e",
             annotations=[dict(text="No data in graph yet", showarrow=False,
-                              font=dict(size=16, color="#6B4C35"))]
+                              font=dict(size=16, color="#e0d6c8"))],
         )
         return fig
 
-    pos = nx.spring_layout(G, seed=42, k=2)
-    centrality = nx.degree_centrality(G)
+    # ── layout ───────────────────────────────────────────────────
+    try:
+        pos = nx.kamada_kawai_layout(G)
+    except Exception:
+        pos = nx.spring_layout(G, seed=42, k=2.5)
 
-    edge_x, edge_y = [], []
-    for u, v in G.edges():
+    # ── entity-type color palette ────────────────────────────────
+    TYPE_COLORS = {
+        "person":     "#4ecdc4",   # teal
+        "company":    "#f0a500",   # amber
+        "government": "#a855f7",   # purple
+        "unknown":    "#94a3b8",   # slate gray
+    }
+
+    # ── consolidated edges ───────────────────────────────────────
+    consolidated = get_consolidated_edges(G)
+    max_weight = max((e["weight"] for e in consolidated), default=1)
+
+    edge_traces = []
+    edge_annotations = []
+
+    for edge in consolidated:
+        u, v = edge["source"], edge["target"]
         x0, y0 = pos[u]
         x1, y1 = pos[v]
-        edge_x += [x0, x1, None]
-        edge_y += [y0, y1, None]
+        w = edge["weight"]
 
+        # Width: 1.5 → 7 based on weight
+        line_width = 1.5 + (w / max(max_weight, 1)) * 5.5
+
+        # Color: light warm gray → hot red based on weight
+        ratio = (w - 1) / max(max_weight - 1, 1)
+        r = int(160 + ratio * 95)     # 160 → 255
+        g = int(140 - ratio * 80)     # 140 → 60
+        b = int(120 - ratio * 80)     # 120 → 40
+        edge_color = f"rgba({r},{g},{b},0.6)"
+
+        # Hover text for edge
+        case_str = ", ".join(edge["case_ids"][:5])
+        types_str = ", ".join(sorted(edge["edge_types"]))
+        hover = f"Cases: {w}<br>{case_str}<br>Types: {types_str}"
+
+        edge_traces.append(go.Scatter(
+            x=[x0, x1, None], y=[y0, y1, None],
+            mode="lines",
+            line=dict(width=line_width, color=edge_color),
+            hoverinfo="text",
+            hovertext=hover,
+            showlegend=False,
+        ))
+
+        # Annotation label for multi-case edges
+        if w >= 2:
+            mx, my = (x0 + x1) / 2, (y0 + y1) / 2
+            edge_annotations.append(dict(
+                x=mx, y=my, text=f"×{w}",
+                showarrow=False,
+                font=dict(size=10, color="#fbbf24", family="Inter, sans-serif"),
+                bgcolor="rgba(26,26,46,0.7)",
+                borderpad=2,
+            ))
+
+    # ── nodes ────────────────────────────────────────────────────
     node_x = [pos[n][0] for n in G.nodes()]
     node_y = [pos[n][1] for n in G.nodes()]
-    node_size = [10 + centrality.get(n, 0) * 60 for n in G.nodes()]
-    node_color = [
-        "#C0522B" if G.nodes[n].get("case_count", 0) > 5 else "#8B5E3C"
+
+    case_counts = [G.nodes[n].get("case_count", 0) for n in G.nodes()]
+    max_cc = max(case_counts) if case_counts else 1
+
+    node_size = [
+        14 + (G.nodes[n].get("case_count", 0) / max(max_cc, 1)) * 36
         for n in G.nodes()
     ]
-    node_text = [
-        f"{G.nodes[n].get('label', n)}<br>Cases: {G.nodes[n].get('case_count', 0)}"
+    node_color = [
+        TYPE_COLORS.get(G.nodes[n].get("entity_type", "unknown"), TYPE_COLORS["unknown"])
+        for n in G.nodes()
+    ]
+    node_border_width = [
+        3 if G.nodes[n].get("case_count", 0) >= 4 else 1.5
+        for n in G.nodes()
+    ]
+    node_border_color = [
+        "#ef4444" if G.nodes[n].get("case_count", 0) >= 4 else "rgba(255,255,255,0.3)"
         for n in G.nodes()
     ]
 
-    fig = go.Figure(data=[
-        go.Scatter(
-            x=edge_x, y=edge_y, mode="lines",
-            line=dict(width=1, color="#A0522D"),
-            hoverinfo="none",
+    node_text = [G.nodes[n].get("label", n) for n in G.nodes()]
+    hover_text = [
+        f"<b>{G.nodes[n].get('label', n)}</b><br>"
+        f"Type: {G.nodes[n].get('entity_type', 'unknown').title()}<br>"
+        f"Cases: {G.nodes[n].get('case_count', 0)}<br>"
+        f"Connections: {G.degree(n)}"
+        for n in G.nodes()
+    ]
+
+    # Glow layer for high-involvement nodes
+    glow_x, glow_y, glow_size, glow_color = [], [], [], []
+    for n in G.nodes():
+        if G.nodes[n].get("case_count", 0) >= 4:
+            glow_x.append(pos[n][0])
+            glow_y.append(pos[n][1])
+            s = 14 + (G.nodes[n].get("case_count", 0) / max(max_cc, 1)) * 36
+            glow_size.append(s + 18)
+            glow_color.append("rgba(239,68,68,0.15)")
+
+    glow_trace = go.Scatter(
+        x=glow_x, y=glow_y, mode="markers",
+        marker=dict(size=glow_size, color=glow_color, line=dict(width=0)),
+        hoverinfo="skip", showlegend=False,
+    ) if glow_x else None
+
+    node_trace = go.Scatter(
+        x=node_x, y=node_y, mode="markers+text",
+        marker=dict(
+            size=node_size, color=node_color,
+            line=dict(width=node_border_width, color=node_border_color),
         ),
-        go.Scatter(
-            x=node_x, y=node_y, mode="markers+text",
-            marker=dict(
-                size=node_size, color=node_color,
-                line=dict(width=2, color="#F5F0E8"),
-            ),
-            text=[G.nodes[n].get("label", n) for n in G.nodes()],
-            hovertext=node_text,
-            hoverinfo="text",
-            textfont=dict(color="#2C1A0E", size=10),
-        ),
-    ])
-    fig.update_layout(
-        paper_bgcolor="#F5F0E8",
-        plot_bgcolor="#F5F0E8",
+        text=node_text,
+        textposition="top center",
+        textfont=dict(color="#e0d6c8", size=11, family="Inter, sans-serif"),
+        hovertext=hover_text,
+        hoverinfo="text",
         showlegend=False,
-        margin=dict(l=0, r=0, t=0, b=0),
+    )
+
+    # ── assemble figure ──────────────────────────────────────────
+    data = edge_traces
+    if glow_trace:
+        data.append(glow_trace)
+    data.append(node_trace)
+
+    # Legend entries for entity types (invisible points for legend only)
+    for etype, color in TYPE_COLORS.items():
+        has_type = any(
+            G.nodes[n].get("entity_type", "unknown") == etype for n in G.nodes()
+        )
+        if has_type:
+            data.append(go.Scatter(
+                x=[None], y=[None], mode="markers",
+                marker=dict(size=10, color=color),
+                name=etype.title(),
+                showlegend=True,
+            ))
+
+    fig = go.Figure(data=data)
+
+    fig.update_layout(
+        paper_bgcolor="#1a1a2e",
+        plot_bgcolor="#1a1a2e",
+        showlegend=True,
+        legend=dict(
+            font=dict(color="#e0d6c8", size=11, family="Inter, sans-serif"),
+            bgcolor="rgba(26,26,46,0.8)",
+            bordercolor="rgba(255,255,255,0.1)",
+            borderwidth=1,
+            orientation="h",
+            yanchor="bottom", y=1.02, xanchor="center", x=0.5,
+        ),
+        margin=dict(l=10, r=10, t=40, b=10),
         xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
         yaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-        height=500,
+        height=550,
+        annotations=edge_annotations,
+        hoverlabel=dict(
+            bgcolor="#2C1A0E", font_size=12, font_color="#e0d6c8",
+            font_family="Inter, sans-serif",
+        ),
     )
     return fig
 
