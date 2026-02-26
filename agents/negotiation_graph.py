@@ -21,37 +21,39 @@ class NegotiationState(TypedDict):
     status: str
 
 PLAINTIFF_PROMPT = PromptTemplate.from_template("""
-You are an AI agent representing the PLAINTIFF.
+You are an AI agent representing the PLAINTIFF in an Indian legal dispute.
 Case: {case_summary}
 Interests: {plaintiff_interests}
-Claim: ${claim_amount}. Current Offer: ${current_offer}. Turn {turn}/{max_turns}.
+Claim: ₹{claim_amount}. Current Offer: ₹{current_offer}. Turn {turn}/{max_turns}.
 History: {history}
 If offer is fair (within 15%), accept. Start strong, then compromise.
+Cite relevant Indian law (CPC, IPC, RERA, Consumer Protection Act, etc.) in your arguments.
 Return JSON only, no markdown:
 {{"message": "<2-3 sentences citing legal principle>", "counter_offer": <float>, "accept": <true/false>}}
 """)
 
 DEFENDANT_PROMPT = PromptTemplate.from_template("""
-You are an AI agent representing the DEFENDANT.
+You are an AI agent representing the DEFENDANT in an Indian legal dispute.
 Case: {case_summary}
 Interests: {defendant_interests}
-Claim: ${claim_amount}. Current Offer: ${current_offer}. Turn {turn}/{max_turns}.
+Claim: ₹{claim_amount}. Current Offer: ₹{current_offer}. Turn {turn}/{max_turns}.
 History: {history}
 Minimize liability but be reasonable. Accept if offer is fair.
+Cite relevant Indian legal defenses and precedents in your arguments.
 Return JSON only, no markdown:
 {{"message": "<2-3 sentences citing legal principle>", "counter_offer": <float>, "accept": <true/false>}}
 """)
 
 MEDIATOR_PROMPT = PromptTemplate.from_template("""
-You are a neutral AI mediator. Case: {case_summary}
-Offer: ${current_offer}. Claim: ${claim_amount}. Turn {turn}/{max_turns}. Gap: ${gap}.
+You are a neutral AI mediator in an Indian legal dispute. Case: {case_summary}
+Offer: ₹{current_offer}. Claim: ₹{claim_amount}. Turn {turn}/{max_turns}. Gap: ₹{gap}.
 Suggest compromise. Return JSON only, no markdown:
 {{"message": "<1-2 sentence hint>", "suggested_offer": <float>}}
 """)
 
 def _fmt(history):
     if not history: return "No prior exchanges."
-    return "\n".join(f"[{h['speaker']}]: {h['message']} (${h.get('offer_amount','N/A')})" for h in history[-6:])
+    return "\n".join(f"[{h['speaker']}]: {h['message']} (₹{h.get('offer_amount','N/A')})" for h in history[-6:])
 
 def _clean(raw):
     raw = raw.strip()
@@ -80,7 +82,7 @@ def defendant_node(state, llm):
 
 def mediator_node(state, llm):
     if state.get("plaintiff_accepted") and state.get("defendant_accepted"):
-        return {"status":"settled","settlement_text":f"Settlement at ${state['current_offer']:,.2f}","history":[{"speaker":"Mediator","message":f"Both parties accepted ${state['current_offer']:,.2f}. Settlement reached!","offer_amount":state["current_offer"]}]}
+        return {"status":"settled","settlement_text":f"Settlement at ₹{state['current_offer']:,.2f}","history":[{"speaker":"Mediator","message":f"Both parties accepted ₹{state['current_offer']:,.2f}. Settlement reached!","offer_amount":state["current_offer"]}]}
     if state["turn"] >= state["max_turns"]:
         return {"status":"failed","history":[{"speaker":"Mediator","message":"Max rounds reached. Case escalated to trial.","offer_amount":state["current_offer"]}]}
     po = do = state["current_offer"]
@@ -91,7 +93,7 @@ def mediator_node(state, llm):
     gap = abs(po-do)
     if state["turn"] >= 8:
         s = (po+do)/2
-        return {"history":[{"speaker":"Mediator","message":f"Final rounds. Accept ${s:,.2f} to avoid trial.","offer_amount":s}],"current_offer":s,"turn":state["turn"]+1}
+        return {"history":[{"speaker":"Mediator","message":f"Final rounds. Accept ₹{s:,.2f} to avoid trial.","offer_amount":s}],"current_offer":s,"turn":state["turn"]+1}
     chain = MEDIATOR_PROMPT | llm | StrOutputParser()
     try:
         raw = chain.invoke({"case_summary":state["case_summary"],"current_offer":state["current_offer"],"claim_amount":state["claim_amount"],"turn":state["turn"],"max_turns":state["max_turns"],"gap":gap})

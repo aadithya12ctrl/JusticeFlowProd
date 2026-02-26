@@ -14,7 +14,7 @@ from agents.emotion_agent import analyze_emotion, EMOTION_COLORS, EMOTION_ICONS
 
 
 def render():
-    page_header("Emotion Monitor", "Real-time emotional temperature analysis")
+    page_header("Litigation Risk Indicator", "Language-based litigation risk analysis")
 
     cases = get_all_cases()
     if not cases:
@@ -32,7 +32,7 @@ def render():
         return
 
     # Analyze button
-    if st.button("💭 Analyze Emotional Temperature", use_container_width=True):
+    if st.button("📊 Analyze Litigation Risk", use_container_width=True):
         with st.spinner("💭 Analyzing emotional content..."):
             try:
                 llm = get_llm()

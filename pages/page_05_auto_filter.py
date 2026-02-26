@@ -35,14 +35,14 @@ Return JSON only, no markdown:
 }}
 Case title: {title}
 Case description: {description}
-Claim amount: ${claim_amount}
+Claim amount: ₹{claim_amount}
 """)
 
 
 def _check_small_claims(case: dict) -> dict:
     """Check 1: Minimum claim threshold."""
-    if case.get("claim_amount", 0) < 500:
-        return {"passed": False, "reason": "Claim below $500 minimum. Route to small claims advisory.", "routing": "small_claims_reroute"}
+    if case.get("claim_amount", 0) < 25000:
+        return {"passed": False, "reason": "Claim below ₹25,000 minimum. Route to Lok Adalat or consumer forum.", "routing": "lok_adalat_reroute"}
     return {"passed": True, "reason": "Claim amount meets minimum threshold."}
 
 

@@ -33,7 +33,7 @@ Return JSON only, no markdown:
 Category: {category} Summary: {summary} Jurisdiction: {jurisdiction}
 """)
 
-TIME_ESTIMATES = {"landlord_tenant":"3-6 weeks","employment":"4-8 weeks","contract":"3-6 weeks","personal_injury":"6-12 weeks","family":"8-16 weeks","small_claims":"1-3 weeks","other":"4-8 weeks"}
+TIME_ESTIMATES = {"rera":"8-16 weeks","rent_control":"3-6 weeks","labour_industrial":"4-8 weeks","contract_civil":"3-6 weeks","motor_accident":"6-12 weeks","consumer":"4-8 weeks","family_matrimonial":"8-16 weeks","cheque_bounce":"4-8 weeks","other":"4-8 weeks"}
 
 def render():
     page_header("Judge Cockpit", "Full case review in under 90 seconds")
@@ -115,5 +115,5 @@ def render():
     with st.expander("📋 Full Case Details"):
         st.markdown(f"**Plaintiff:** {get_entity_name(case.get('plaintiff_id',''))}")
         st.markdown(f"**Defendant:** {get_entity_name(case.get('defendant_id',''))}")
-        st.markdown(f"**Claim:** ${case.get('claim_amount',0):,.2f}")
+        st.markdown(f"**Claim:** ₹{case.get('claim_amount',0):,.2f}")
         st.markdown(f"**Description:** {case['description']}")

@@ -5,23 +5,24 @@ from langchain_core.output_parsers import StrOutputParser
 
 
 DLS_PROMPT = PromptTemplate.from_template("""
-You are a senior court clerk. Analyze this case and estimate dismissal probability.
+You are a senior Indian court registrar. Analyze this case and estimate dismissal probability
+under the Code of Civil Procedure (CPC) Order VII Rule 11 and other applicable Indian laws.
 Return JSON only, no markdown, no explanation. Schema:
 {{
   "dls": <int 0-100>,
   "reasons": {{
     "lack_of_jurisdiction": <int 0-100>,
-    "statute_of_limitations": <int 0-100>,
+    "limitation_period": <int 0-100>,
     "insufficient_evidence": <int 0-100>,
     "frivolous_claim": <int 0-100>,
     "procedural_defect": <int 0-100>
   }},
-  "explanation": "<2-3 sentence plain English summary>"
+  "explanation": "<2-3 sentence plain English summary citing relevant Indian law>"
 }}
 Case title: {title}
 Case description: {description}
 Jurisdiction: {jurisdiction}
-Claim amount: ${claim_amount}
+Claim amount: ₹{claim_amount}
 Category: {category}
 """)
 
@@ -44,13 +45,13 @@ def compute_dls(case: dict, llm) -> dict:
         data = json.loads(raw)
         dls = max(0, min(100, int(data.get("dls", 50))))
         reasons = data.get("reasons", {})
-        for key in ["lack_of_jurisdiction", "statute_of_limitations",
+        for key in ["lack_of_jurisdiction", "limitation_period",
                      "insufficient_evidence", "frivolous_claim", "procedural_defect"]:
             reasons[key] = max(0, min(100, int(reasons.get(key, 0))))
         return {"dls": dls, "reasons": reasons, "explanation": data.get("explanation", "Analysis could not be completed.")}
     except (json.JSONDecodeError, KeyError, TypeError, ValueError) as e:
         return {
             "dls": 50,
-            "reasons": {"lack_of_jurisdiction":10,"statute_of_limitations":10,"insufficient_evidence":10,"frivolous_claim":10,"procedural_defect":10},
+            "reasons": {"lack_of_jurisdiction":10,"limitation_period":10,"insufficient_evidence":10,"frivolous_claim":10,"procedural_defect":10},
             "explanation": f"Unable to fully analyze case. Default assessment applied. ({str(e)[:50]})",
         }

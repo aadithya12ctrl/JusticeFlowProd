@@ -42,7 +42,7 @@ with st.sidebar:
             "📝 File Case",
             "📊 DLS Engine",
             "🤝 Negotiation Sandbox",
-            "💭 Emotion Monitor",
+            "📊 Litigation Risk",
             "🔍 Auto Filter",
             "👨‍⚖️ Judge Cockpit",
             "🕸️ Conflict Graph",
@@ -141,9 +141,9 @@ if page == "🏠 Home":
         """, unsafe_allow_html=True)
         st.markdown("""
         <div class="metric-card">
-            <h3>💭 Emotion Layer</h3>
+            <h3>📊 Risk Indicator</h3>
             <div style="color: #6B4C35; font-size: 0.9rem;">
-                Real-time emotional temperature monitoring with cooling-off alerts.
+                Linguistic risk analysis with calibrated scoring and cooling-off alerts.
             </div>
         </div>
         """, unsafe_allow_html=True)
@@ -215,7 +215,7 @@ elif page == "📊 DLS Engine":
 elif page == "🤝 Negotiation Sandbox":
     from pages.page_03_negotiation import render
     render()
-elif page == "💭 Emotion Monitor":
+elif page == "📊 Litigation Risk":
     from pages.page_04_emotion_monitor import render
     render()
 elif page == "🔍 Auto Filter":

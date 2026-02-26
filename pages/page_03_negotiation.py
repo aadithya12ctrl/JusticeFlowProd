@@ -18,15 +18,15 @@ from langchain_core.output_parsers import StrOutputParser
 # ─── Agent System Prompts ─────────────────────────────────────────────
 
 PLAINTIFF_AGENT_PROMPT = PromptTemplate.from_template("""
-SYSTEM: You are the Plaintiff's Legal Advocate AI. You ALWAYS argue in favor of the plaintiff.
+SYSTEM: You are the Plaintiff's Legal Advocate AI in an Indian legal dispute. You ALWAYS argue in favor of the plaintiff.
 Your job is to build the strongest possible case for why the plaintiff deserves the claimed amount.
-Cite legal principles, precedents, and fairness arguments. Be persuasive but professional.
+Cite Indian legal principles, statutes (CPC, IPC, RERA, Consumer Protection Act, Indian Contract Act), and precedents. Be persuasive but professional.
 If the presiding judge has given directions or observations, you MUST acknowledge and respond to them.
 
 CASE: {case_summary}
 PLAINTIFF INTERESTS: {plaintiff_interests}
-ORIGINAL CLAIM: ${claim_amount}
-CURRENT OFFER ON TABLE: ${current_offer}
+ORIGINAL CLAIM: ₹{claim_amount}
+CURRENT OFFER ON TABLE: ₹{current_offer}
 ROUND: {round} of {max_rounds}
 
 FULL NEGOTIATION HISTORY:
@@ -35,19 +35,19 @@ FULL NEGOTIATION HISTORY:
 {human_input}
 
 Respond with JSON only, no markdown:
-{{"message": "<your 2-4 sentence argument for this round, cite a specific legal principle or precedent>", "proposed_amount": <float — your proposed settlement amount>, "willing_to_settle": <true if you'd accept current offer, false otherwise>}}
+{{"message": "<your 2-4 sentence argument for this round, cite a specific Indian legal principle or precedent>", "proposed_amount": <float — your proposed settlement amount>, "willing_to_settle": <true if you'd accept current offer, false otherwise>}}
 """)
 
 DEFENDANT_AGENT_PROMPT = PromptTemplate.from_template("""
-SYSTEM: You are the Defendant's Legal Advocate AI. You ALWAYS argue in favor of the defendant.
+SYSTEM: You are the Defendant's Legal Advocate AI in an Indian legal dispute. You ALWAYS argue in favor of the defendant.
 Your job is to minimize the defendant's liability while appearing reasonable.
-Cite legal defenses, challenge evidence, and propose lower settlements. Be strategic but fair.
+Cite Indian legal defenses, challenge evidence, and propose lower settlements. Be strategic but fair.
 If the presiding judge has given directions or observations, you MUST acknowledge and respond to them.
 
 CASE: {case_summary}
 DEFENDANT INTERESTS: {defendant_interests}
-ORIGINAL CLAIM: ${claim_amount}
-CURRENT OFFER ON TABLE: ${current_offer}
+ORIGINAL CLAIM: ₹{claim_amount}
+CURRENT OFFER ON TABLE: ₹{current_offer}
 ROUND: {round} of {max_rounds}
 
 FULL NEGOTIATION HISTORY:
@@ -56,7 +56,7 @@ FULL NEGOTIATION HISTORY:
 {human_input}
 
 Respond with JSON only, no markdown:
-{{"message": "<your 2-4 sentence counter-argument, cite a legal defense or precedent>", "proposed_amount": <float — your proposed settlement amount>, "willing_to_settle": <true if you'd accept current offer, false otherwise>}}
+{{"message": "<your 2-4 sentence counter-argument, cite an Indian legal defense or precedent>", "proposed_amount": <float — your proposed settlement amount>, "willing_to_settle": <true if you'd accept current offer, false otherwise>}}
 """)
 
 
@@ -75,7 +75,7 @@ def _format_history(history: list[dict]) -> str:
     for h in history:
         role = h.get("role", "")
         icon = "👤" if "Plaintiff" in role else "👤" if "Defendant" in role else "🧑‍⚖️"
-        lines.append(f"[{icon} {role}]: {h['message']} (Proposed: ${h.get('amount', 'N/A')})")
+        lines.append(f"[{icon} {role}]: {h['message']} (Proposed: ₹{h.get('amount', 'N/A')})")
     return "\n".join(lines)
 
 
@@ -132,7 +132,7 @@ def render():
             p_name = get_entity_name(case.get("plaintiff_id", ""))
             neg["plaintiff_interests"] = st.text_area(
                 f"👤 Plaintiff ({p_name}) Interests",
-                value=f"Seeking full compensation of ${case.get('claim_amount', 0):,.2f} for all damages.",
+                value=f"Seeking full compensation of ₹{case.get('claim_amount', 0):,.2f} for all damages.",
                 height=100, key=f"pi_{case_id}",
             )
         with col2:
@@ -162,7 +162,7 @@ def render():
                 st.markdown(f"""
                 <div class="chat-plaintiff">
                     <strong style="color:#A0522D;">👤 {role}</strong>
-                    <span style="float:right; color:#C0522B; font-weight:700;">${amt:,.2f}</span>
+                    <span style="float:right; color:#C0522B; font-weight:700;">₹{amt:,.2f}</span>
                     <p style="color:#2C1A0E; margin:0.3rem 0 0 0;">{msg}</p>
                 </div>
                 """, unsafe_allow_html=True)
@@ -170,7 +170,7 @@ def render():
                 st.markdown(f"""
                 <div class="chat-defendant">
                     <strong style="color:#8B5E3C;">👤 {role}</strong>
-                    <span style="float:right; color:#8B5E3C; font-weight:700;">${amt:,.2f}</span>
+                    <span style="float:right; color:#8B5E3C; font-weight:700;">₹{amt:,.2f}</span>
                     <p style="color:#2C1A0E; margin:0.3rem 0 0 0;">{msg}</p>
                 </div>
                 """, unsafe_allow_html=True)
@@ -194,7 +194,7 @@ def render():
         st.markdown(f"""
         <div style="text-align:center; padding:1rem; margin:1rem 0; background:linear-gradient(135deg,#2C1A0E,#3D2818); border-radius:12px;">
             <div style="color:#D4A843; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em;">Current Offer on Table</div>
-            <div style="color:#F5F0E8; font-size:2.5rem; font-weight:800;">${neg['current_offer']:,.2f}</div>
+            <div style="color:#F5F0E8; font-size:2.5rem; font-weight:800;">₹{neg['current_offer']:,.2f}</div>
             <div style="color:#F5F0E8; opacity:0.6; font-size:0.85rem;">Round {neg['round']} of {neg['max_rounds']}</div>
         </div>
         """, unsafe_allow_html=True)
@@ -229,10 +229,10 @@ def render():
             neg["status"] = "settled"
             neg["history"].append({
                 "role": "System",
-                "message": f"Judge ordered settlement at ${neg['current_offer']:,.2f}.",
+                "message": f"Judge ordered settlement at ₹{neg['current_offer']:,.2f}.",
                 "amount": neg["current_offer"],
             })
-            update_case(case_id, status="resolved", settlement_text=f"Settled at ${neg['current_offer']:,.2f} by judicial order.")
+            update_case(case_id, status="resolved", settlement_text=f"Settled at ₹{neg['current_offer']:,.2f} by judicial order.")
             st.rerun()
 
         if end_neg:
@@ -306,8 +306,8 @@ def render():
 
             # Save to DB
             insert_negotiation_turn(case_id, neg["round"], "human_mediator", human_input or "(no input)")
-            insert_negotiation_turn(case_id, neg["round"], "agent_plaintiff", f"{p_result['message']} [${p_result['amount']:,.2f}]")
-            insert_negotiation_turn(case_id, neg["round"], "agent_defendant", f"{d_result['message']} [${d_result['amount']:,.2f}]")
+            insert_negotiation_turn(case_id, neg["round"], "agent_plaintiff", f"{p_result['message']} [₹{p_result['amount']:,.2f}]")
+            insert_negotiation_turn(case_id, neg["round"], "agent_defendant", f"{d_result['message']} [₹{d_result['amount']:,.2f}]")
 
             # Check if both agents willing to settle
             if p_result["willing"] and d_result["willing"]:
@@ -316,10 +316,10 @@ def render():
                 neg["status"] = "settled"
                 neg["history"].append({
                     "role": "System",
-                    "message": f"Both agents agree to settle at ${avg:,.2f}!",
+                    "message": f"Both agents agree to settle at ₹{avg:,.2f}!",
                     "amount": avg,
                 })
-                update_case(case_id, status="resolved", settlement_text=f"Settled at ${avg:,.2f}")
+                update_case(case_id, status="resolved", settlement_text=f"Settled at ₹{avg:,.2f}")
             elif neg["round"] >= neg["max_rounds"]:
                 neg["status"] = "failed"
                 neg["history"].append({
@@ -337,7 +337,7 @@ def render():
     if neg["status"] == "settled":
         st.markdown(f"""
         <div class="success-card" style="text-align:center; font-size:1.2rem;">
-            ✅ SETTLEMENT REACHED — ${neg['current_offer']:,.2f}
+            ✅ SETTLEMENT REACHED — ₹{neg['current_offer']:,.2f}
         </div>
         """, unsafe_allow_html=True)
 
@@ -347,8 +347,8 @@ def render():
 ====================
 Case ID: #{case_id}  —  {case['title']}
 Plaintiff: {p_name}  |  Defendant: {d_name}
-Settlement Amount: ${neg['current_offer']:,.2f}
-Original Claim:   ${case.get('claim_amount', 0):,.2f}
+Settlement Amount: ₹{neg['current_offer']:,.2f}
+Original Claim:   ₹{case.get('claim_amount', 0):,.2f}
 Rounds: {neg['round']}  |  Status: SETTLED
 """
         st.code(agreement, language="text")

@@ -6,10 +6,10 @@ from langchain_core.output_parsers import StrOutputParser
 
 
 DNA_PROMPT = PromptTemplate.from_template("""
-You are a legal classification engine. Given this case description, extract a JSON object with these fields:
-- category: one of [landlord_tenant, employment, contract, personal_injury, family, small_claims, other]
-- jurisdiction_score: 0.0-1.0 (how clearly the correct court is stated)
-- claim_bucket: 1=<$1k, 2=$1k-10k, 3=$10k-100k, 4=>$100k
+You are an Indian legal classification engine. Given this case description, extract a JSON object with these fields:
+- category: one of [rera, rent_control, labour_industrial, contract_civil, motor_accident, consumer, family_matrimonial, cheque_bounce, other]
+- jurisdiction_score: 0.0-1.0 (how clearly the correct court/tribunal/forum is identified)
+- claim_bucket: 1=<₹50k, 2=₹50k-5L, 3=₹5L-50L, 4=>₹50L
 - evidence_strength: 0.0-1.0
 - emotional_intensity: 0.0-1.0
 - novelty: 0.0-1.0 (how unusual the claim is)
@@ -18,8 +18,9 @@ Return ONLY valid JSON, no markdown, no explanation. Case: {case_text}
 """)
 
 CATEGORY_MAP = {
-    "landlord_tenant": 0.1, "employment": 0.2, "contract": 0.3,
-    "personal_injury": 0.4, "family": 0.5, "small_claims": 0.6, "other": 0.9,
+    "rera": 0.1, "rent_control": 0.15, "labour_industrial": 0.2,
+    "contract_civil": 0.3, "motor_accident": 0.4, "consumer": 0.5,
+    "family_matrimonial": 0.6, "cheque_bounce": 0.7, "other": 0.9,
 }
 
 

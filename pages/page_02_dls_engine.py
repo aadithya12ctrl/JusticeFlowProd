@@ -121,7 +121,7 @@ def render():
             st.markdown(f"**Title:** {case['title']}")
             st.markdown(f"**Category:** {case.get('category', 'N/A').replace('_',' ').title()}")
             st.markdown(f"**Jurisdiction:** {case.get('jurisdiction', 'N/A')}")
-            st.markdown(f"**Claim Amount:** ${case.get('claim_amount', 0):,.2f}")
+            st.markdown(f"**Claim Amount:** ₹{case.get('claim_amount', 0):,.2f}")
             st.markdown(f"**Description:** {case['description']}")
     else:
         st.markdown("""

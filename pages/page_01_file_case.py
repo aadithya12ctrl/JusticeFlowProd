@@ -24,7 +24,7 @@ def render():
             category = st.selectbox("📂 Category", CASE_CATEGORIES,
                                     format_func=lambda x: x.replace("_", " ").title())
         with col2:
-            claim_amount = st.number_input("💰 Claim Amount ($)", min_value=0.0, step=100.0, value=5000.0)
+            claim_amount = st.number_input("💰 Claim Amount (₹)", min_value=0.0, step=1000.0, value=50000.0)
             defendant_name = st.text_input("👤 Defendant Name", placeholder="e.g. Greenfield Properties LLC")
             jurisdiction = st.text_input("🏛️ Jurisdiction", placeholder="e.g. Municipal Court")
 
@@ -56,7 +56,7 @@ def render():
             # Build DNA vector
             try:
                 llm = get_llm()
-                case_text = f"Title: {title}\nCategory: {category}\nJurisdiction: {jurisdiction}\nClaim: ${claim_amount}\nDescription: {description}"
+                case_text = f"Title: {title}\nCategory: {category}\nJurisdiction: {jurisdiction}\nClaim: ₹{claim_amount}\nDescription: {description}"
                 dna_vector = build_dna_vector(case_text, llm)
             except Exception as e:
                 st.warning(f"⚠️ LLM call failed, using default vector. Error: {str(e)[:100]}")

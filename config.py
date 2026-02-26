@@ -26,12 +26,14 @@ COLORS = {
 
 # ─── Case Categories ─────────────────────────────────────────────────
 CASE_CATEGORIES = [
-    "landlord_tenant",
-    "employment",
-    "contract",
-    "personal_injury",
-    "family",
-    "small_claims",
+    "rera",
+    "rent_control",
+    "labour_industrial",
+    "contract_civil",
+    "motor_accident",
+    "consumer",
+    "family_matrimonial",
+    "cheque_bounce",
     "other",
 ]
 
