@@ -8,40 +8,41 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from utils.theme import page_header, metric_card
 from utils.charts import render_dna_helix
+from utils.i18n import t
 from config import get_llm, CASE_CATEGORIES
 from db.database import insert_case, update_case, get_historical_cases, get_case
 from agents.dna_agent import build_dna_vector, find_case_twin
 
 
 def render():
-    page_header("File a Case", "Submit a new dispute for AI-powered analysis")
+    page_header(t("file_title"), t("file_subtitle"))
 
     with st.form("case_form", clear_on_submit=False):
         col1, col2 = st.columns(2)
         with col1:
-            title = st.text_input("📋 Case Title", placeholder="e.g. Landlord Heating Dispute")
-            plaintiff_name = st.text_input("👤 Plaintiff Name", placeholder="e.g. John Smith")
-            category = st.selectbox("📂 Category", CASE_CATEGORIES,
+            title = st.text_input(t("case_title"), placeholder=t("case_title_placeholder"))
+            plaintiff_name = st.text_input(t("plaintiff_name"), placeholder=t("plaintiff_placeholder"))
+            category = st.selectbox(t("category"), CASE_CATEGORIES,
                                     format_func=lambda x: x.replace("_", " ").title())
         with col2:
-            claim_amount = st.number_input("💰 Claim Amount (₹)", min_value=0.0, step=1000.0, value=50000.0)
-            defendant_name = st.text_input("👤 Defendant Name", placeholder="e.g. Greenfield Properties LLC")
-            jurisdiction = st.text_input("🏛️ Jurisdiction", placeholder="e.g. Municipal Court")
+            claim_amount = st.number_input(t("claim_amount"), min_value=0.0, step=1000.0, value=50000.0)
+            defendant_name = st.text_input(t("defendant_name"), placeholder=t("defendant_placeholder"))
+            jurisdiction = st.text_input("🏛️ " + t("jurisdiction").replace("🏛️ ", ""), placeholder=t("jurisdiction_placeholder"))
 
         description = st.text_area(
-            "📝 Case Description",
+            t("description"),
             height=150,
-            placeholder="Describe the dispute in detail. Include relevant dates, events, and damages..."
+            placeholder=t("description_placeholder"),
         )
 
-        submitted = st.form_submit_button("⚖️ Submit Case & Generate DNA", use_container_width=True)
+        submitted = st.form_submit_button(t("submit_btn"), use_container_width=True)
 
     if submitted:
         if not title or not description or not plaintiff_name or not defendant_name:
-            st.error("⚠️ Please fill in all required fields: Title, Description, Plaintiff, and Defendant.")
+            st.error(t("fill_required"))
             return
 
-        with st.spinner("🧬 Filing case and computing DNA vector..."):
+        with st.spinner(t("filing_spinner")):
             # Insert case
             case_id = insert_case(
                 title=title,
@@ -82,7 +83,7 @@ def render():
         col1, col2 = st.columns([1, 1])
 
         with col1:
-            st.markdown("### 🧬 Case DNA Vector")
+            st.markdown(f"### {t('case_dna_vector')}")
             labels = ["Category", "Jurisdiction", "Claim Bucket", "Evidence", "Emotion", "Novelty"]
             for label, val in zip(labels, dna_vector):
                 color = "#6B8F71" if val < 0.4 else "#D4A843" if val < 0.7 else "#C0522B"
@@ -99,7 +100,7 @@ def render():
 
         with col2:
             if twin and similarity > 0:
-                st.markdown("### 🔗 Case Twin Found")
+                st.markdown(f"### {t('case_twin_found')}")
                 st.markdown(f"""
                 <div class="case-card">
                     <div class="case-title">📋 {twin.get('id', 'Unknown')} — {twin.get('category', '').replace('_',' ').title()}</div>
@@ -120,7 +121,7 @@ def render():
                 st.info("No similar historical case found in the database. Seed demo data to enable case matching.")
 
         # DNA Comparison Radar Chart
-        st.markdown("### 🧬 Case DNA Comparison")
+        st.markdown(f"### {t('dna_comparison')}")
         twin_vec = None
         if twin:
             try:
